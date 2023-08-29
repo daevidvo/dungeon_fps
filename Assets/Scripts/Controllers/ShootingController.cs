@@ -10,6 +10,8 @@ public class ShootingController : MonoBehaviour
     public Transform crosshairTransform;
     public LayerMask targetLayer; // Layer containing objects that can be hit by bullets
 
+    public Coroutine currCoroutine;
+
 
     // Start is called before the first frame update
     void Start()
@@ -33,13 +35,13 @@ public class ShootingController : MonoBehaviour
 
     public void HandleShooting()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetKey(KeyCode.Mouse0) && currCoroutine == null)
         {
-            Shoot();
+            currCoroutine = StartCoroutine(Shoot());
         }
     }
 
-    private void Shoot()
+    IEnumerator Shoot()
     {
         GameObject bullet = Instantiate(bulletPrefab, gunBarrel.position, gunBarrel.rotation);
         Rigidbody bulletRigidbody = bullet.GetComponent<Rigidbody>();
@@ -49,5 +51,8 @@ public class ShootingController : MonoBehaviour
             Vector3 shootDirection = (crosshairTransform.position - gunBarrel.position).normalized;
             bulletRigidbody.velocity = shootDirection * bulletSpeed;
         }
+
+        yield return new WaitForSeconds(0.1f);
+        currCoroutine = null;
     }
 }
